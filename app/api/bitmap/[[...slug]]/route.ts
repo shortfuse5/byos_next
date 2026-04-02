@@ -26,6 +26,7 @@ export async function GET(
 		const widthParam = searchParams.get("width");
 		const heightParam = searchParams.get("height");
 		const grayscaleParam = searchParams.get("grayscale");
+		const rotateParam = searchParams.get("rotate");
 
 		const width = widthParam ? parseInt(widthParam, 10) : DEFAULT_IMAGE_WIDTH;
 		const height = heightParam
@@ -36,6 +37,7 @@ export async function GET(
 		const validWidth = width > 0 ? width : DEFAULT_IMAGE_WIDTH;
 		const validHeight = height > 0 ? height : DEFAULT_IMAGE_HEIGHT;
 		const grayscaleLevels = grayscaleParam ? parseInt(grayscaleParam, 10) : 2;
+		const rotation = rotateParam ? parseInt(rotateParam, 10) : undefined;
 
 		logger.info(
 			`Bitmap request for: ${bitmapPath} in ${validWidth}x${validHeight} with ${grayscaleLevels} gray levels`,
@@ -50,6 +52,7 @@ export async function GET(
 			validWidth,
 			validHeight,
 			grayscaleLevels,
+			rotation,
 		);
 
 		if (
@@ -84,6 +87,7 @@ const renderRecipeBitmap = cache(
 		width: number,
 		height: number,
 		grayscaleLevels: number = 2,
+		rotation?: number,
 	) => {
 		const { config, Component, props, element } = await buildRecipeElement({
 			slug: recipeId,
@@ -106,6 +110,7 @@ const renderRecipeBitmap = cache(
 			imageHeight: height,
 			formats: ["bitmap"],
 			grayscale: grayscaleLevels,
+			rotation,
 		});
 
 		return renders.bitmap ?? Buffer.from([]);

@@ -234,6 +234,7 @@ export interface RenderBmpOptions {
 	width?: number;
 	height?: number;
 	grayscale?: number; // Number of gray levels: 2 (black/white), 4, or 16
+	rotate?: number; // Degrees clockwise (e.g. 90 for landscape-on-portrait-native device)
 }
 
 export async function renderBmp(png: Buffer, options: RenderBmpOptions = {}) {
@@ -241,6 +242,7 @@ export async function renderBmp(png: Buffer, options: RenderBmpOptions = {}) {
 		ditheringMethod = DitheringMethod.FLOYD_STEINBERG,
 		inverted = false,
 		grayscale = 2, // Default to 2 levels (black/white)
+		rotate,
 	} = options;
 
 	// Validate grayscale levels
@@ -251,18 +253,28 @@ export async function renderBmp(png: Buffer, options: RenderBmpOptions = {}) {
 		);
 	}
 
-	// Fixed dimensions to match the device requirements
-	const targetWidth = options.width ?? 800;
-	const targetHeight = options.height ?? 480;
+	// Pre-rotate the source PNG when requested (e.g. landscape content on a
+	// portrait-native device).  For 90° / 270° the dimensions are swapped so
+	// that the rest of the pipeline operates on the correct target size.
+	let sourcePng = png;
+	let targetWidth = options.width ?? 800;
+	let targetHeight = options.height ?? 480;
+	if (rotate) {
+		sourcePng = await sharp(png).rotate(rotate).toBuffer();
+		if (rotate === 90 || rotate === 270) {
+			[targetWidth, targetHeight] = [targetHeight, targetWidth];
+		}
+	}
+
 	const targetPixelCount = targetWidth * targetHeight;
 
 	// Load image metadata
-	const metadata = await sharp(png).metadata();
+	const metadata = await sharp(sourcePng).metadata();
 	const isDoubleSize =
 		metadata.width === targetWidth * 2 && metadata.height === targetHeight * 2;
 
-	// Step 1: Resize to 800x480 if necessary
-	let image = sharp(png);
+	// Step 1: Resize to target dimensions if necessary
+	let image = sharp(sourcePng);
 	if (isDoubleSize) {
 		image = image.resize(targetWidth, targetHeight, {
 			kernel: sharp.kernel.nearest,

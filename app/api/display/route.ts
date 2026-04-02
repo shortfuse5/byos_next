@@ -100,6 +100,9 @@ export async function GET(request: Request) {
 		);
 		let dynamicRefreshRate = 180;
 		let imageUrl: string;
+		// Portrait-native devices need the image pre-rotated server-side so the
+		// firmware can display it correctly without a rotation instruction.
+		const rotationSuffix = orientation === "landscape" ? "&rotate=90" : "";
 
 		switch (device.display_mode) {
 			case DeviceDisplayMode.PLAYLIST:
@@ -128,12 +131,12 @@ export async function GET(request: Request) {
 						dynamicRefreshRate = 60;
 					}
 				}
-				imageUrl = `${baseUrl}/${screenToDisplay || "not-found"}.bmp?width=${deviceWidth}&height=${deviceHeight}&grayscale=${grayscaleLevels}`;
+				imageUrl = `${baseUrl}/${screenToDisplay || "not-found"}.bmp?width=${deviceWidth}&height=${deviceHeight}&grayscale=${grayscaleLevels}${rotationSuffix}`;
 				break;
 
 			case DeviceDisplayMode.MIXUP:
 				if (device.mixup_id) {
-					imageUrl = `${baseUrl}/mixup/${device.mixup_id}.bmp?width=${deviceWidth}&height=${deviceHeight}&grayscale=${grayscaleLevels}`;
+					imageUrl = `${baseUrl}/mixup/${device.mixup_id}.bmp?width=${deviceWidth}&height=${deviceHeight}&grayscale=${grayscaleLevels}${rotationSuffix}`;
 					const metadata = {
 						deviceId: device.friendly_id,
 						mixupId: device.mixup_id,
@@ -143,7 +146,7 @@ export async function GET(request: Request) {
 						metadata,
 					});
 				} else {
-					imageUrl = `${baseUrl}/${screenToDisplay || "not-found"}.bmp?width=${deviceWidth}&height=${deviceHeight}&grayscale=${grayscaleLevels}`;
+					imageUrl = `${baseUrl}/${screenToDisplay || "not-found"}.bmp?width=${deviceWidth}&height=${deviceHeight}&grayscale=${grayscaleLevels}${rotationSuffix}`;
 				}
 				dynamicRefreshRate = calculateRefreshRate(
 					device.refresh_schedule as unknown as RefreshSchedule,
@@ -158,7 +161,7 @@ export async function GET(request: Request) {
 					180,
 					device.timezone || "UTC",
 				);
-				imageUrl = `${baseUrl}/${screenToDisplay || "not-found"}.bmp?width=${deviceWidth}&height=${deviceHeight}&grayscale=${grayscaleLevels}`;
+				imageUrl = `${baseUrl}/${screenToDisplay || "not-found"}.bmp?width=${deviceWidth}&height=${deviceHeight}&grayscale=${grayscaleLevels}${rotationSuffix}`;
 				break;
 		}
 

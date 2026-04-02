@@ -169,6 +169,49 @@
 		"version": "0.1.0",
 		"category": "display-components"
 	},
+	"google-calendar": {
+		"title": "Google Calendar",
+		"published": true,
+		"createdAt": "2026-03-31T00:00:00Z",
+		"updatedAt": "2026-03-31T00:00:00Z",
+		"description": "Week agenda with NOW/NEXT hero pulled live from Google Calendar API.",
+		"componentPath": "./screens/google-calendar/google-calendar",
+		"hasDataFetch": true,
+		"props": {
+			"events": [],
+			"currentTime": "--:--",
+			"currentDay": "Loading...",
+			"weekStart": "",
+			"weekEnd": ""
+		},
+		"params": {
+			"calendarId": {
+				"type": "string",
+				"label": "Calendar ID",
+				"description": "Your Google Calendar ID (e.g. your@gmail.com or the ID from calendar settings)",
+				"default": "",
+				"placeholder": "your@gmail.com"
+			},
+			"apiKey": {
+				"type": "string",
+				"label": "Google API Key",
+				"description": "Google Calendar API key from Google Cloud Console",
+				"default": "",
+				"placeholder": "AIza..."
+			},
+			"timezone": {
+				"type": "string",
+				"label": "Timezone",
+				"description": "IANA timezone string, e.g. Europe/London",
+				"default": "Europe/London"
+			}
+		},
+		"tags": ["calendar", "google", "live-data", "agenda"],
+		"author": { "name": "Your Name", "github": "yourgithub" },
+		"renderSettings": { "doubleSizeForSharperText": true },
+		"version": "0.1.0",
+		"category": "display-components"
+	},
 	"not-found": {
 		"title": "Not Found Recipe",
 		"published": true,
